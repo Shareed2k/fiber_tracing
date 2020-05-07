@@ -2,8 +2,8 @@ github.com/davecgh/go-spew v1.1.0 h1:ZDRjVQ15GmhC3fiQ8ni8+OwkZQO4DARzQgrnXU1Liz8
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
-github.com/gofiber/fiber v1.9.3 h1:KOuTZABkLAOQkPfrXhnIaPi7QsMkFClBKK6bLL2f4ZM=
-github.com/gofiber/fiber v1.9.3/go.mod h1:o2YQgwJW8+Z16x8MTos4nYn8PD1RJpzu9fojiGqjSjI=
+github.com/gofiber/fiber v1.9.4 h1:7lzIhs0kxPOypUSuRB1b8Y4Vn7HZOa7YdHf+vCaJnF0=
+github.com/gofiber/fiber v1.9.4/go.mod h1:o2YQgwJW8+Z16x8MTos4nYn8PD1RJpzu9fojiGqjSjI=
 github.com/gorilla/schema v1.1.0 h1:CamqUDOFUBqzrvxuz2vEwo8+SUdwsluFh7IlzJh30LY=
 github.com/gorilla/schema v1.1.0/go.mod h1:kgLaKoK1FELgZqMAVxx/5cbj0kT+57qxUrAlIO2eleU=
 github.com/klauspost/compress v1.10.4 h1:jFzIFaf586tquEB5EhzQG0HwGNSlgAJpG53G6Ss11wc=
