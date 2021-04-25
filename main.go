@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"unsafe"
 
-	"github.com/gofiber/fiber"
+	"github.com/gofiber/fiber/v2"
 	"github.com/opentracing/opentracing-go"
 	"github.com/opentracing/opentracing-go/ext"
 )
@@ -33,7 +33,7 @@ type Config struct {
 	Modify func(*fiber.Ctx, opentracing.Span)
 }
 
-func New(config ...Config) func(*fiber.Ctx) {
+func New(config ...Config) fiber.Handler {
 	// Init config
 	var cfg Config
 	if len(config) > 0 {
@@ -60,34 +60,32 @@ func New(config ...Config) func(*fiber.Ctx) {
 		}
 	}
 
-	return func(ctx *fiber.Ctx) {
+	return func(ctx *fiber.Ctx) error {
 		// Filter request to skip middleware
 		if cfg.Filter != nil && cfg.Filter(ctx) {
-			ctx.Next()
-
-			return
+			return ctx.Next()
 		}
 
 		var span opentracing.Span
 
-		opname := cfg.OperationName(ctx)
+		operationName := cfg.OperationName(ctx)
 		tr := cfg.Tracer
 		hdr := make(http.Header)
 
-		ctx.Fasthttp.Request.Header.VisitAll(func(k, v []byte) {
+		ctx.Request().Header.VisitAll(func(k, v []byte) {
 			hdr.Set(getString(k), getString(v))
 		})
 
 		if ctx, err := tr.Extract(opentracing.HTTPHeaders, opentracing.HTTPHeadersCarrier(hdr)); err != nil {
-			span = tr.StartSpan(opname)
+			span = tr.StartSpan(operationName)
 		} else {
-			span = tr.StartSpan(opname, ext.RPCServerOption(ctx))
+			span = tr.StartSpan(operationName, ext.RPCServerOption(ctx))
 		}
 
 		cfg.Modify(ctx, span)
 
 		defer func() {
-			status := ctx.Fasthttp.Response.StatusCode()
+			status := ctx.Response().StatusCode()
 
 			ext.HTTPStatusCode.Set(span, uint16(status))
 
@@ -98,6 +96,6 @@ func New(config ...Config) func(*fiber.Ctx) {
 			span.Finish()
 		}()
 
-		ctx.Next()
+		return ctx.Next()
 	}
 }
