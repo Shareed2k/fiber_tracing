@@ -9,6 +9,8 @@ import (
 	"github.com/opentracing/opentracing-go/ext"
 )
 
+const DefaultParentSpanKey = "#defaultTracingParentSpanKey"
+
 var getString = func(b []byte) string {
 	return *(*string)(unsafe.Pointer(&b))
 }
@@ -18,6 +20,10 @@ type Config struct {
 	// Tracer
 	// Default: NoopTracer
 	Tracer opentracing.Tracer
+
+	// ParentSpanKey
+	// Default: #defaultTracingParentSpanKey
+	ParentSpanKey string
 
 	// OperationName
 	// Default: func(ctx *fiber.Ctx) string {
@@ -42,6 +48,10 @@ func New(config ...Config) fiber.Handler {
 
 	if cfg.Tracer == nil {
 		cfg.Tracer = &opentracing.NoopTracer{}
+	}
+
+	if cfg.ParentSpanKey == "" {
+		cfg.ParentSpanKey = DefaultParentSpanKey
 	}
 
 	if cfg.Modify == nil {
@@ -95,6 +105,8 @@ func New(config ...Config) fiber.Handler {
 
 			span.Finish()
 		}()
+
+		ctx.Locals(cfg.ParentSpanKey, span)
 
 		return ctx.Next()
 	}
