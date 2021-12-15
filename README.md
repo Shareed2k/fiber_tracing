@@ -1,4 +1,4 @@
-## fiber_tracing is middleware for fiber framework 
+## fiber_tracing is middleware for fiber framework
 
 fiber_tracing Middleware trace requests on [Fiber framework](https://gofiber.io/) with OpenTracing API.
 You can use every tracer that implement OpenTracing interface
@@ -14,6 +14,8 @@ go get -u github.com/shareed2k/fiber_tracing
 | :--- | :--- | :--- | :--- |
 | Tracer | `opentracing.Tracer` | initializes an opentracing tracer., possible values: `jaeger`, `lightstep`, `instana`, `basictracer-go`, ... | `"&opentracing.NoopTracer{}"` |
 | OperationName | `func(*fiber.Ctx) string` | Span operation name | `"HTTP " + ctx.Method() + " URL: " + ctx.Path()` |
+| ComponentName | `string` | Used for describing the tracing component name | `fiber/v2` |
+| ParentSpanKey | `string` | context key string used to get span scoped to the request  | `#defaultTracingParentSpanKey` |
 | Filter | `func(*fiber.Ctx) bool` | Defines a function to skip middleware. | `nil` |
 | Modify | `func(*fiber.Ctx, opentracing.Span)` | Defines a function to edit span like add tags or logs... | `span.SetTag("http.remote_addr", ctx.IP()) ...` |
 
@@ -52,9 +54,38 @@ func main() {
 
 	defer closer.Close()
 
-	app.Use(fiber_tracing.New(fiber_tracing.Config{
+	app.Use(fiber_tracing.NewWithConfig(fiber_tracing.Config{
 		Tracer: tracer,
 	}))
+
+	// or
+	/*
+	app.Use(fiber_tracing.New(tracer))
+	*/
+
+	app.Get("/", func(c *fiber.Ctx) {
+		c.Send("Welcome!")
+	})
+
+	app.Listen(3000)
+}
+```
+
+### Example 2 with jaeger default tracer
+```go
+package main
+
+import (
+	"github.com/gofiber/fiber"
+	"github.com/shareed2k/fiber_tracing"
+	"github.com/uber/jaeger-client-go/config"
+)
+
+func main() {
+	app := fiber.New()
+
+	closer := fiber_tracing.NewWithJaegerTracer(app)
+	defer closer.Close()
 
 	app.Get("/", func(c *fiber.Ctx) {
 		c.Send("Welcome!")
